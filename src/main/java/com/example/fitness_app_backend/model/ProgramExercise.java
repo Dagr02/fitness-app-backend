@@ -1,8 +1,10 @@
 package com.example.fitness_app_backend.model;
 
 import jakarta.persistence.*;
+import lombok.Data;
 
 @Entity
+@Data
 @Table(name = "program_exercise")
 public class ProgramExercise {
     @Id

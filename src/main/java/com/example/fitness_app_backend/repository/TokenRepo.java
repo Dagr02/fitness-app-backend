@@ -15,7 +15,7 @@ public interface TokenRepo extends JpaRepository<Token, Long> {
 
     @Transactional
     @Modifying
-    @Query("UPDATE Token c " +
+    @Query("UPDATE token c " +
             "SET c.confirmedAt = ?2 " +
             "WHERE c.token = ?1")
     int updateConfirmedAt(String token,

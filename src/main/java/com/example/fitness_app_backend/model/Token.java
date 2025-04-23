@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @RequiredArgsConstructor
-@Entity
+@Entity(name = "token")
 public class Token {
     @Id
     @SequenceGenerator(
@@ -39,10 +39,10 @@ public class Token {
             name="user_id"
     )
     private User user;
-    public Token(String token, LocalDateTime createdAt, LocalDateTime expiresAt, User appUser) {
+    public Token(String token, LocalDateTime createdAt, LocalDateTime expiresAt, User user) {
         this.token = token;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;
-        this.user = appUser;
+        this.user = user;
     }
 }

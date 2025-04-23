@@ -15,7 +15,7 @@ import java.util.Collections;
 @EqualsAndHashCode
 @NoArgsConstructor
 @Entity
-@Table(name = "_users")
+@Table(name = "users")
 public class User implements UserDetails {
     @Id
     @SequenceGenerator(
