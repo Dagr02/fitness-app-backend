@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ExerciseRepo extends JpaRepository<Exercise, Long> {
-    List<Exercise> findAllByUserIsNullOrUser(@Param("user")User user);
+
 }

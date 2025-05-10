@@ -1,10 +1,14 @@
 package com.example.fitness_app_backend.service;
 
-
-
-
+import com.example.fitness_app_backend.dto.programs.ProgramDTO;
+import com.example.fitness_app_backend.dto.programs.ProgramExerciseDTO;
+import com.example.fitness_app_backend.dto.programs.UserProgramDTO;
+import com.example.fitness_app_backend.model.ProgramExercise;
 import com.example.fitness_app_backend.model.Token;
 import com.example.fitness_app_backend.model.User;
+import com.example.fitness_app_backend.model.UserProgramExercises;
+import com.example.fitness_app_backend.repository.ProgramExerciseRepo;
+import com.example.fitness_app_backend.repository.UserProgramExerciseRepo;
 import com.example.fitness_app_backend.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +21,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-
 
 @Service
 @AllArgsConstructor
@@ -28,6 +33,9 @@ public class UserService implements UserDetailsService {
     private final TokenService tokenService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
+
+    private final UserProgramExerciseRepo userProgramExerciseRepo;
+    private final ProgramExerciseRepo programExerciseRepo;
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
@@ -67,5 +75,37 @@ public class UserService implements UserDetailsService {
         return (User) auth.getPrincipal();
     }
 
+    public UserProgramDTO getUserProgram(){
+        User user = getCurrentUser();
 
+        UserProgramExercises userProgramExercises = userProgramExerciseRepo.getUserPrograms(user.getId());
+
+        UserProgramDTO userProgramDTO = new UserProgramDTO();
+        // program dto
+        ProgramDTO programDTO = new ProgramDTO();
+
+        programDTO.setName(userProgramExercises.getUserProgram().getProgram().getName());
+        programDTO.setDescription(userProgramExercises.getUserProgram().getProgram().getName());
+        programDTO.setStartDate(userProgramExercises.getUserProgram().getProgram().getStartDate());
+        programDTO.setEndDate(userProgramExercises.getUserProgram().getProgram().getEndDate());
+
+        List<ProgramExercise> programExercises = programExerciseRepo.findProgramExerciseByProgramId(userProgramExercises.getUserProgram().getProgram().getId());
+        List<ProgramExerciseDTO> exercises = new ArrayList<>();
+        for(ProgramExercise pe : programExercises){
+            ProgramExerciseDTO programExerciseDTO = new ProgramExerciseDTO();
+            programExerciseDTO.setProgramId(pe.getProgram().getId());
+            programExerciseDTO.setExerciseId(pe.getExercise().getId());
+            programExerciseDTO.setSets(pe.getSets());
+            programExerciseDTO.setReps(pe.getReps());
+            programExerciseDTO.setDayNumber(pe.getDayNumber());
+            programExerciseDTO.setOrderIndex(pe.getOrderIndex());
+
+            exercises.add(programExerciseDTO);
+        }
+
+        userProgramDTO.setProgram(programDTO);
+        userProgramDTO.setExercises(exercises);
+
+        return userProgramDTO;
+    }
 }

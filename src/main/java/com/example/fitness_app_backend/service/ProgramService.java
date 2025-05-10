@@ -1,54 +1,68 @@
 package com.example.fitness_app_backend.service;
 
-import com.example.fitness_app_backend.dto.ProgramDTO;
-import com.example.fitness_app_backend.dto.ProgramExerciseDTO;
-import com.example.fitness_app_backend.model.Exercise;
-import com.example.fitness_app_backend.model.Program;
-import com.example.fitness_app_backend.model.ProgramExercise;
-import com.example.fitness_app_backend.model.User;
+import com.example.fitness_app_backend.dto.CreateProgramDTO;
+import com.example.fitness_app_backend.dto.programs.CreateProgramExerciseDTO;
+import com.example.fitness_app_backend.model.*;
 import com.example.fitness_app_backend.repository.ExerciseRepo;
 import com.example.fitness_app_backend.repository.ProgramExerciseRepo;
 import com.example.fitness_app_backend.repository.ProgramRepo;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.example.fitness_app_backend.repository.UserProgramRepo;
+import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
-@Slf4j
+@AllArgsConstructor
 public class ProgramService {
     private final ProgramRepo programRepo;
-    private final ProgramExerciseRepo programExRepo;
+    private final ProgramExerciseRepo programExerciseRepo;
     private final ExerciseRepo exerciseRepo;
+    private final UserProgramRepo userProgramRepo;
     private final UserService userService;
 
-    public Program createProgram(ProgramDTO dto) {
+    @Transactional
+    public UserProgram createCustomProgram(@RequestBody CreateProgramDTO createProgramDTO){
+        //get current user
+        User user = userService.getCurrentUser();
+
+        // create program
         Program program = new Program();
-        program.setName(dto.getName());
-        program.setDescription(dto.getDescription());
-        program.setStartDate(dto.getStartDate());
-        program.setEndDate(dto.getEndDate());
-        program.setUser(userService.getCurrentUser());
+        program.setName(createProgramDTO.getProgram().getName());
+        program.setDescription(createProgramDTO.getProgram().getDescription());
         program.setCreatedAt(LocalDateTime.now());
-        return programRepo.save(program);
+        program.setStartDate(createProgramDTO.getProgram().getStartDate());
+        program.setEndDate(createProgramDTO.getProgram().getEndDate());
+
+        programRepo.save(program);
+
+        //create program exercise for each exercise
+        List<CreateProgramExerciseDTO> exercisesDTO = createProgramDTO.getExercises();
+        List<ProgramExercise> pe = new ArrayList<>();
+        for(CreateProgramExerciseDTO item : exercisesDTO){
+            ProgramExercise programExercise = new ProgramExercise();
+            programExercise.setProgram(program);
+
+            Exercise exercise = exerciseRepo.findById(item.getExerciseId()).orElseThrow(() -> new RuntimeException("Exercise not found"));
+            programExercise.setExercise(exercise);
+            programExercise.setReps(item.getReps());
+            programExercise.setSets(item.getSets());
+            programExercise.setOrderIndex(item.getOrderIndex());
+
+            pe.add(programExercise);
+        }
+        programExerciseRepo.saveAll(pe);
+
+        //create user program
+        UserProgram userProgram = new UserProgram();
+        userProgram.setProgramDate(LocalDateTime.now());
+        userProgram.setUser(user);
+        userProgram.setProgram(program);
+
+        return userProgramRepo.save(userProgram);
     }
-
-    public void addExerciseToProgram(Long programId, ProgramExerciseDTO dto) {
-        Program program = programRepo.findById(programId).orElseThrow();
-        Exercise exercise = exerciseRepo.findById(dto.getExerciseId()).orElseThrow();
-
-        ProgramExercise pe = new ProgramExercise();
-        pe.setProgram(program);
-        pe.setExercise(exercise);
-        pe.setSets(dto.getSets());
-        pe.setReps(dto.getReps());
-        pe.setOrderIndex(dto.getOrderIndex());
-
-        programExRepo.save(pe);
-    }
-
 }

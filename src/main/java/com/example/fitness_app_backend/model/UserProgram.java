@@ -1,31 +1,32 @@
 package com.example.fitness_app_backend.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity
+@NoArgsConstructor
+@AllArgsConstructor
 @Data
-@Table(name = "program_exercise")
-public class ProgramExercise {
+@Entity
+@Table(name = "user_program")
+public class UserProgram {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;
 
-    @ManyToOne
-    @JoinColumn(name = "exercise_id")
-    private Exercise exercise;
-
-    private int sets;
-    private int reps;
-    private int orderIndex;
-    private int dayNumber;
-
-    @OneToMany(mappedBy = "programExercise")
+    @OneToMany(mappedBy = "userProgram")
     private List<UserProgramExercises> userProgramExercises;
+
+    private LocalDateTime programDate;
 }

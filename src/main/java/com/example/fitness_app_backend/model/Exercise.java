@@ -1,20 +1,15 @@
 package com.example.fitness_app_backend.model;
 
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
-@Getter
-@Setter
+@Data
 @Entity
 @Table(name = "exercise")
 public class Exercise {
@@ -34,14 +29,11 @@ public class Exercise {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "highest_weight")
-    @JsonProperty(value = "highest_weight")
-    private double highestWeight;
-
     @OneToMany(mappedBy = "exercise")
     private List<ExerciseStats> exerciseStats;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
-    private User user;
+    @OneToMany(mappedBy = "exercise")
+    private List<ProgramExercise> programExercise;
+
+
 }

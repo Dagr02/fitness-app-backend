@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 
 @Data
@@ -39,6 +40,9 @@ public class User implements UserDetails {
 
     private Boolean locked = false;
     private Boolean enabled = false;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExerciseStats> exerciseStats;
 
     public User(String firstname, String lastname, String email, String password, UserRole userRole) {
         this.firstname = firstname;

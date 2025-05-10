@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class ExerciseStatsDTO {
-    private Long exerciseId;
+    private ExerciseDTO exercise;
     private int sets;
     private int reps;
     private double weight;

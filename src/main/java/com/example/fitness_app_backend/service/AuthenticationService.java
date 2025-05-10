@@ -1,21 +1,26 @@
 package com.example.fitness_app_backend.service;
 
+import com.example.fitness_app_backend.dto.LoginRequestDTO;
 import com.example.fitness_app_backend.dto.RegistrationRequestDTO;
 import com.example.fitness_app_backend.enums.UserRole;
 import com.example.fitness_app_backend.model.Token;
 import com.example.fitness_app_backend.model.User;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
 @AllArgsConstructor
-public class RegistrationService{
+public class AuthenticationService {
     private final UserService userService;
     private final TokenService tokenService;
     private final EmailSender emailSender;
+    private final AuthenticationManager authenticationManager;
 
     public String register(RegistrationRequestDTO request){
         User user = new User(request.getFirstname(), request.getLastname(),
@@ -26,6 +31,17 @@ public class RegistrationService{
         //send email
         emailSender.send(request.getEmail(), buildEmail(request.getFirstname(), confirmationLink));
         return token;
+    }
+
+    public UserDetails authenticate(LoginRequestDTO loginRequestDTO){
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequestDTO.getEmail(),
+                        loginRequestDTO.getPassword()
+                )
+        );
+
+        return userService.loadUserByUsername(loginRequestDTO.getEmail());
     }
 
     @Transactional

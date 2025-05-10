@@ -41,10 +41,6 @@ public class ExerciseStats  {
     private Exercise exercise;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @ManyToOne
-    @JoinColumn(name = "session_id")
-    private WorkoutSession session;
 }
