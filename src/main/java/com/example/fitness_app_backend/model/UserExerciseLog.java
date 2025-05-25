@@ -9,15 +9,15 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "user_program_exercises")
-public class UserProgramExercises {
+@Table(name = "user_exercise_log")
+public class UserExerciseLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_program_id")
-    private UserProgram userProgram;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "program_exercise_id")

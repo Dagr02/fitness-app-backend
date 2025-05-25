@@ -1,14 +1,13 @@
 package com.example.fitness_app_backend.service;
 
 import com.example.fitness_app_backend.dto.programs.ProgramDTO;
+import com.example.fitness_app_backend.dto.programs.ProgramDayDTO;
 import com.example.fitness_app_backend.dto.programs.ProgramExerciseDTO;
 import com.example.fitness_app_backend.dto.programs.UserProgramDTO;
-import com.example.fitness_app_backend.model.ProgramExercise;
-import com.example.fitness_app_backend.model.Token;
-import com.example.fitness_app_backend.model.User;
-import com.example.fitness_app_backend.model.UserProgramExercises;
+import com.example.fitness_app_backend.model.*;
 import com.example.fitness_app_backend.repository.ProgramExerciseRepo;
-import com.example.fitness_app_backend.repository.UserProgramExerciseRepo;
+import com.example.fitness_app_backend.repository.UserExerciseLogRepo;
+import com.example.fitness_app_backend.repository.UserProgramRepo;
 import com.example.fitness_app_backend.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -34,7 +32,8 @@ public class UserService implements UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final static String USER_NOT_FOUND_MSG = "user with email %s not found";
 
-    private final UserProgramExerciseRepo userProgramExerciseRepo;
+    private final UserExerciseLogRepo userExerciseLogRepo;
+    private final UserProgramRepo userProgramRepo;
     private final ProgramExerciseRepo programExerciseRepo;
 
     @Override
@@ -78,33 +77,68 @@ public class UserService implements UserDetailsService {
     public UserProgramDTO getUserProgram(){
         User user = getCurrentUser();
 
-        UserProgramExercises userProgramExercises = userProgramExerciseRepo.getUserPrograms(user.getId());
+        UserProgram userProgram = userProgramRepo.findByUserId(user.getId())
+                .orElseThrow(() -> new RuntimeException("No program found for user"));
 
-        UserProgramDTO userProgramDTO = new UserProgramDTO();
-        // program dto
-        ProgramDTO programDTO = new ProgramDTO();
+        Program program = userProgram.getProgram();
+        List<ProgramExercise> programExercises = programExerciseRepo.findByProgramId(program.getId());
 
-        programDTO.setName(userProgramExercises.getUserProgram().getProgram().getName());
-        programDTO.setDescription(userProgramExercises.getUserProgram().getProgram().getName());
-        programDTO.setStartDate(userProgramExercises.getUserProgram().getProgram().getStartDate());
-        programDTO.setEndDate(userProgramExercises.getUserProgram().getProgram().getEndDate());
+        List<UserExerciseLog> logs = userExerciseLogRepo.findByUserIdAndProgramId(user.getId(), program.getId());
 
-        List<ProgramExercise> programExercises = programExerciseRepo.findProgramExerciseByProgramId(userProgramExercises.getUserProgram().getProgram().getId());
-        List<ProgramExerciseDTO> exercises = new ArrayList<>();
+        Map<Long, UserExerciseLog> logMap = logs.stream()
+                .collect(Collectors.toMap(
+                   log -> log.getProgramExercise().getId(),
+                   log -> log
+                ));
+
+        Map<Integer, List<ProgramExerciseDTO>> daysMap = new TreeMap<>();
+
         for(ProgramExercise pe : programExercises){
-            ProgramExerciseDTO programExerciseDTO = new ProgramExerciseDTO();
-            programExerciseDTO.setProgramId(pe.getProgram().getId());
-            programExerciseDTO.setExerciseId(pe.getExercise().getId());
-            programExerciseDTO.setSets(pe.getSets());
-            programExerciseDTO.setReps(pe.getReps());
-            programExerciseDTO.setDayNumber(pe.getDayNumber());
-            programExerciseDTO.setOrderIndex(pe.getOrderIndex());
+            ProgramExerciseDTO dto = new ProgramExerciseDTO();
+            dto.setProgramExerciseId(pe.getId());
+            dto.setExerciseId(pe.getExercise().getId());
+            dto.setExerciseName(pe.getExercise().getName());
+            dto.setSets(pe.getSets());
+            dto.setReps(pe.getReps());
+            dto.setOrderIndex(pe.getOrderIndex());
+            dto.setDayNumber(pe.getDayNumber());
 
-            exercises.add(programExerciseDTO);
+            UserExerciseLog log = logMap.get(pe.getId());
+            if(log != null){
+                dto.setCompletedSets(log.getCompletedSets());
+                dto.setCompletedReps(log.getCompletedReps());
+                dto.setWeightUsed(log.getWeightUsed());
+                dto.setWorkoutDate(log.getWorkoutDate());
+            }
+
+            daysMap.computeIfAbsent(pe.getDayNumber(), d -> new ArrayList<>()).add(dto);
         }
 
+        List<ProgramDayDTO> programDays = daysMap.entrySet().stream()
+                .map(entry -> {
+                    ProgramDayDTO day = new ProgramDayDTO();
+                    day.setDayNumber(entry.getKey());
+                    day.setExercises(entry.getValue());
+                    return day;
+                }).toList();
+
+        int currentDay = logs.stream()
+                .map(log -> log.getProgramExercise().getDayNumber())
+                .max(Integer::compareTo)
+                .orElse(0) + 1;
+
+        currentDay = Math.min(currentDay, daysMap.keySet().stream().max(Integer::compareTo).orElse(1));
+
+        ProgramDTO programDTO = new ProgramDTO();
+        programDTO.setName(program.getName());
+        programDTO.setDescription(program.getDescription());
+        programDTO.setStartDate(program.getStartDate());
+        programDTO.setEndDate(program.getEndDate());
+
+        UserProgramDTO userProgramDTO = new UserProgramDTO();
         userProgramDTO.setProgram(programDTO);
-        userProgramDTO.setExercises(exercises);
+        userProgramDTO.setDays(programDays);
+        userProgramDTO.setCurrentDay(currentDay);
 
         return userProgramDTO;
     }

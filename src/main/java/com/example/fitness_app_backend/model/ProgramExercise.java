@@ -27,5 +27,5 @@ public class ProgramExercise {
     private int dayNumber;
 
     @OneToMany(mappedBy = "programExercise")
-    private List<UserProgramExercises> userProgramExercises;
+    private List<UserExerciseLog> userProgramExercises;
 }

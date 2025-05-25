@@ -3,7 +3,6 @@ package com.example.fitness_app_backend.model;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class UserProgram {
     private Program program;
 
     @OneToMany(mappedBy = "userProgram")
-    private List<UserProgramExercises> userProgramExercises;
+    private List<UserExerciseLog> userProgramExercises;
 
     private LocalDateTime programDate;
 }

@@ -10,9 +10,5 @@ import java.util.List;
 
 @Repository
 public interface ProgramExerciseRepo extends JpaRepository<ProgramExercise, Long> {
-    @Transactional
-    @Query(" SELECT pe FROM ProgramExercise pe " +
-            " WHERE pe.program.id = ?1"
-    )
-    List<ProgramExercise> findProgramExerciseByProgramId(Long programId);
+    List<ProgramExercise> findByProgramId(Long programId);
 }
