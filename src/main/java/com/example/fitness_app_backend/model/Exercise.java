@@ -30,9 +30,6 @@ public class Exercise {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "exercise")
-    private List<ExerciseStats> exerciseStats;
-
-    @OneToMany(mappedBy = "exercise")
     private List<ProgramExercise> programExercise;
 
 

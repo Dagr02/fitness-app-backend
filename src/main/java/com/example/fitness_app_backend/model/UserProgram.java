@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,9 +22,6 @@ public class UserProgram {
     @ManyToOne
     @JoinColumn(name = "program_id")
     private Program program;
-
-    @OneToMany(mappedBy = "userProgram")
-    private List<UserExerciseLog> userProgramExercises;
 
     private LocalDateTime programDate;
 }

@@ -3,11 +3,6 @@ server:
 spring:
   profiles:
     active: local
-  datasource:
-    driver-class-name: org.postgresql.Driver
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
   jpa:
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -15,15 +10,13 @@ spring:
     hibernate:
       ddl-auto: update
   flyway:
-    enabled: true
+    enabled: false
     validate-on-migrate: true
     locations: classpath:db/migration
 
   mail:
     host: smtp.gmail.com
     port: 587
-    username: ${MAIL_USERNAME}
-    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -41,5 +34,4 @@ logging:
 
 security:
   jwt:
-    secret-key: ${JWT_SECRET_KEY}
     expiration-time: 3600000

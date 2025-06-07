@@ -3,6 +3,7 @@ package com.example.fitness_app_backend.dto.programs;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class ProgramExerciseDTO {
@@ -14,8 +15,5 @@ public class ProgramExerciseDTO {
     private int orderIndex;
     private int dayNumber;
 
-    private Integer completedSets;
-    private Integer completedReps;
-    private Double weightUsed;
-    private LocalDateTime workoutDate;
+    private List<ExerciseLogDTO> logs;
 }

@@ -23,7 +23,7 @@ public class UserExerciseLog {
     @JoinColumn(name = "program_exercise_id")
     private ProgramExercise programExercise;
 
-    private Integer completedSets;
+    private Integer setNumber;
     private Integer completedReps;
     private Double weightUsed;
     private LocalDateTime workoutDate;
