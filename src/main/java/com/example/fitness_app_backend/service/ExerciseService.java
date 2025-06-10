@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 import java.time.LocalDateTime;
@@ -26,7 +25,7 @@ public class ExerciseService {
     private final ExerciseRepo exerciseRepo;
     private final UserService userService;
 
-    @GetMapping
+
     public List<ExerciseDTO> getAllExercises(){
         logger.info("Getting all exercises");
         return exerciseRepo.findAll().stream()
