@@ -6,10 +6,7 @@ import com.example.fitness_app_backend.model.UserProgram;
 import com.example.fitness_app_backend.service.ProgramService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @AllArgsConstructor
@@ -21,5 +18,11 @@ public class ProgramController {
     public ResponseEntity<?> createCustomProgram(@RequestBody CreateProgramDTO dto){
         UserProgramDTO userProgramDTO = programService.createCustomProgram(dto);
         return ResponseEntity.ok(userProgramDTO);
+    }
+
+    @DeleteMapping("/{programId}")
+    public ResponseEntity<Void> deleteProgram(@PathVariable("programId") Long programId){
+        programService.deleteProgram(programId);
+        return ResponseEntity.noContent().build();
     }
 }

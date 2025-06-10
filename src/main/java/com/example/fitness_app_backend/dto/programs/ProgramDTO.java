@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 public class ProgramDTO {
+    private Long id;
     private String name;
     private String description;
     private LocalDateTime startDate;

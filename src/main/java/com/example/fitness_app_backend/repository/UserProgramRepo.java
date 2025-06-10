@@ -8,5 +8,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserProgramRepo extends JpaRepository<UserProgram, Long> {
+
     Optional<UserProgram> findByUserId(Long userId);
+
+    Optional<UserProgram> findByUserIdAndProgramId(Long userId, Long programId);
+
 }

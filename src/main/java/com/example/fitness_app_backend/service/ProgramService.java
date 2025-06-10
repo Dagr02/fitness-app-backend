@@ -6,15 +6,14 @@ import com.example.fitness_app_backend.model.*;
 import com.example.fitness_app_backend.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.stream.Collectors;
+
 
 @Service
 @AllArgsConstructor
@@ -74,5 +73,17 @@ public class ProgramService {
         List<ProgramExercise> programExercises = programExerciseRepo.findByProgramId(program.getId());
         List<UserExerciseLog> logs = userExerciseLogRepo.findByUserIdAndProgramId(user.getId(), program.getId());
         return programMapper.toUserProgramDTO(program, programExercises, logs);
+    }
+
+    @Transactional
+    public void deleteProgram(Long programId){
+        User user = userService.getCurrentUser();
+
+        UserProgram userProgram = userProgramRepo.findByUserIdAndProgramId(user.getId(), programId)
+                .orElseThrow(() -> new AccessDeniedException("You don't have permission to delete this program"));
+
+        programExerciseRepo.deleteByProgramId(programId);
+        userProgramRepo.delete(userProgram);
+        programRepo.deleteById(programId);
     }
 }

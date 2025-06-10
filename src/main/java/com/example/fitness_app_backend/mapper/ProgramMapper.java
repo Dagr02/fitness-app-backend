@@ -67,6 +67,7 @@ public class ProgramMapper {
         currentDay = Math.min(currentDay, maxDay);
 
         ProgramDTO programDTO = new ProgramDTO();
+        programDTO.setId(program.getId());
         programDTO.setName(program.getName());
         programDTO.setDescription(program.getDescription());
         programDTO.setStartDate(program.getStartDate());

@@ -11,4 +11,7 @@ import java.util.List;
 @Repository
 public interface ProgramExerciseRepo extends JpaRepository<ProgramExercise, Long> {
     List<ProgramExercise> findByProgramId(Long programId);
+
+    void deleteByProgramId(Long programId);
+
 }
