@@ -1,4 +1,4 @@
-package com.example.fitness_app_backend.dto;
+package com.example.fitness_app_backend.dto.auth;
 
 import lombok.Data;
 

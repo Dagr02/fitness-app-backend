@@ -1,12 +1,12 @@
 package com.example.fitness_app_backend.service;
 
 
+import com.example.fitness_app_backend.dto.programs.ExerciseDTO;
 import com.example.fitness_app_backend.dto.exercises.CreateExerciseDTO;
 import com.example.fitness_app_backend.dto.exercises.ExerciseDTO;
 import com.example.fitness_app_backend.model.Exercise;
 import com.example.fitness_app_backend.model.User;
 import com.example.fitness_app_backend.repository.ExerciseRepo;
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,11 +28,15 @@ public class ExerciseService {
     private final ExerciseRepo exerciseRepo;
     private final UserService userService;
 
+    @GetMapping
     public List<ExerciseDTO> getAllExercises(){
         logger.info("Getting all exercises");
-        List<Exercise> exercises = exerciseRepo.findGlobalOrUserExercises(userService.getCurrentUserId());
-        return exercises.stream()
-                .map(this::mapToDTO)
+        return exerciseRepo.findAll().stream()
+                .map(ex -> new ExerciseDTO(
+                        ex.getId(),
+                        ex.getName(),
+                        ex.getDescription()
+                ))
                 .collect(Collectors.toList());
     }
 
@@ -52,16 +57,4 @@ public class ExerciseService {
 
 
     }
-
-    private ExerciseDTO mapToDTO(Exercise exercise){
-        ExerciseDTO dto = new ExerciseDTO();
-        dto.setId(exercise.getId());
-        dto.setName(exercise.getName());
-        dto.setDescription(exercise.getDescription());
-
-        return dto;
-    }
-
-
-
 }

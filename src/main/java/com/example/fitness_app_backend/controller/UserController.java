@@ -1,11 +1,12 @@
 package com.example.fitness_app_backend.controller;
 
+import com.example.fitness_app_backend.dto.programs.CreateExerciseLogDTO;
 import com.example.fitness_app_backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @AllArgsConstructor
@@ -16,6 +17,12 @@ public class UserController {
     @GetMapping("/program")
     public ResponseEntity<?> getUserProgram(){
         return ResponseEntity.ok(userService.getUserProgram());
+    }
+
+    @PostMapping("/log-workout")
+    public ResponseEntity<?> saveExerciseLogs(@RequestBody List<CreateExerciseLogDTO> logs){
+        userService.saveExerciseLogs(logs);
+        return ResponseEntity.ok().build();
     }
 
 }

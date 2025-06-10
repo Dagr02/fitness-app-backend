@@ -7,5 +7,6 @@ import java.util.List;
 @Data
 public class UserProgramDTO {
     private ProgramDTO program;
-    private List<ProgramExerciseDTO> exercises;
+    private List<ProgramDayDTO> days;
+    private int currentDay;
 }

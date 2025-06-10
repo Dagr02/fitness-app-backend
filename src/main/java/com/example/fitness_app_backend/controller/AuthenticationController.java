@@ -1,9 +1,9 @@
 package com.example.fitness_app_backend.controller;
 
-import com.example.fitness_app_backend.dto.LoginRequestDTO;
-import com.example.fitness_app_backend.dto.LoginResponseDTO;
-import com.example.fitness_app_backend.dto.RegistrationRequestDTO;
-import com.example.fitness_app_backend.model.User;
+import com.example.fitness_app_backend.dto.auth.LoginRequestDTO;
+import com.example.fitness_app_backend.dto.auth.LoginResponseDTO;
+import com.example.fitness_app_backend.dto.auth.RegistrationRequestDTO;
+import com.example.fitness_app_backend.dto.auth.RegistrationResponseDTO;
 import com.example.fitness_app_backend.service.AuthenticationService;
 import com.example.fitness_app_backend.service.JwtService;
 import jakarta.validation.Valid;
@@ -21,9 +21,12 @@ public class AuthenticationController {
     private final JwtService jwtService;
 
     @PostMapping("/registration")
-    public ResponseEntity<String> register(@RequestBody @Valid
+    public ResponseEntity<RegistrationResponseDTO> register(@RequestBody @Valid
                                            RegistrationRequestDTO request){
-        return ResponseEntity.ok(authenticationService.register(request));
+        String token = authenticationService.register(request);
+        return ResponseEntity.ok(new RegistrationResponseDTO(
+                token, "Registration successful. Please confirm your email."
+        ));
     }
 
     @GetMapping("/registration/confirmation")

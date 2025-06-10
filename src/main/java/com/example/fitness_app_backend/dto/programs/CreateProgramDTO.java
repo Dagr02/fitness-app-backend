@@ -2,10 +2,14 @@ package com.example.fitness_app_backend.dto.programs;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
 public class CreateProgramDTO {
-    private ProgramDTO program;
-    private List<CreateProgramExerciseDTO> exercises;
+    private String name;
+    private String description;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
+    private List<CreateProgramDayDTO> workouts;
 }
