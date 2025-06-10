@@ -12,6 +12,8 @@ import com.example.fitness_app_backend.repository.UserProgramExerciseRepo;
 import com.example.fitness_app_backend.repository.UserRepo;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +31,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Slf4j
 public class UserService implements UserDetailsService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepo userRepository;
     private final TokenService tokenService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -75,13 +79,21 @@ public class UserService implements UserDetailsService {
         return (User) auth.getPrincipal();
     }
 
+    public Long getCurrentUserId(){
+        return getCurrentUser().getId();
+    }
+
     public UserProgramDTO getUserProgram(){
         User user = getCurrentUser();
+        logger.info("Fetching user program for user id {} ", user.getId());
 
         UserProgramExercises userProgramExercises = userProgramExerciseRepo.getUserPrograms(user.getId());
 
+        if (userProgramExercises == null || userProgramExercises.getUserProgram() == null || userProgramExercises.getUserProgram().getProgram() == null) {
+            throw new RuntimeException("No user program found for user with ID: " + user.getId());
+        }
+
         UserProgramDTO userProgramDTO = new UserProgramDTO();
-        // program dto
         ProgramDTO programDTO = new ProgramDTO();
 
         programDTO.setName(userProgramExercises.getUserProgram().getProgram().getName());

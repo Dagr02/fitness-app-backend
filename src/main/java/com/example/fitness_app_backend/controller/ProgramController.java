@@ -1,6 +1,6 @@
 package com.example.fitness_app_backend.controller;
 
-import com.example.fitness_app_backend.dto.CreateProgramDTO;
+import com.example.fitness_app_backend.dto.programs.CreateProgramDTO;
 import com.example.fitness_app_backend.model.UserProgram;
 import com.example.fitness_app_backend.service.ProgramService;
 import lombok.AllArgsConstructor;

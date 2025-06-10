@@ -1,6 +1,6 @@
 package com.example.fitness_app_backend.service;
 
-import com.example.fitness_app_backend.dto.CreateProgramDTO;
+import com.example.fitness_app_backend.dto.programs.CreateProgramDTO;
 import com.example.fitness_app_backend.dto.programs.CreateProgramExerciseDTO;
 import com.example.fitness_app_backend.model.*;
 import com.example.fitness_app_backend.repository.ExerciseRepo;
