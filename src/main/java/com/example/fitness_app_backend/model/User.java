@@ -41,6 +41,12 @@ public class User implements UserDetails {
     private Boolean locked = false;
     private Boolean enabled = false;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserProgram> userPrograms;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserExerciseLog> userExerciseLogs;
+
     public User(String firstname, String lastname, String email, String password, UserRole userRole) {
         this.firstname = firstname;
         this.lastname = lastname;

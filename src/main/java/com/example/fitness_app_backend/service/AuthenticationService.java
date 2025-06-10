@@ -1,14 +1,19 @@
 package com.example.fitness_app_backend.service;
 
-import com.example.fitness_app_backend.dto.LoginRequestDTO;
-import com.example.fitness_app_backend.dto.RegistrationRequestDTO;
+import com.example.fitness_app_backend.dto.auth.LoginRequestDTO;
+import com.example.fitness_app_backend.dto.auth.RegistrationRequestDTO;
 import com.example.fitness_app_backend.enums.UserRole;
+import com.example.fitness_app_backend.exceptions.auth.TokenAlreadyConfirmedException;
+import com.example.fitness_app_backend.exceptions.auth.TokenExpiredException;
+import com.example.fitness_app_backend.exceptions.auth.TokenNotFoundException;
 import com.example.fitness_app_backend.model.Token;
 import com.example.fitness_app_backend.model.User;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -34,14 +39,18 @@ public class AuthenticationService {
     }
 
     public UserDetails authenticate(LoginRequestDTO loginRequestDTO){
-        authenticationManager.authenticate(
+        Authentication authUser = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequestDTO.getEmail(),
                         loginRequestDTO.getPassword()
                 )
         );
 
-        return userService.loadUserByUsername(loginRequestDTO.getEmail());
+        if(authUser.isAuthenticated()){
+            return userService.loadUserByUsername(loginRequestDTO.getEmail());
+        }
+
+        throw new BadCredentialsException("Authentication Failed");
     }
 
     @Transactional
@@ -50,10 +59,10 @@ public class AuthenticationService {
         Token confirmationToken = tokenService
                 .getToken(token)
                 .orElseThrow(() ->
-                        new IllegalStateException("token not found."));
+                        new TokenNotFoundException("token not found."));
 
         if(confirmationToken.getConfirmedAt() != null){
-            throw new IllegalStateException(buildConfirmedPage(
+            throw new TokenAlreadyConfirmedException(buildConfirmedPage(
                     loginLink,"Email already confirmed.")
             );
         }
@@ -61,7 +70,7 @@ public class AuthenticationService {
         LocalDateTime expiredAt = confirmationToken.getExpiresAt();
 
         if(expiredAt.isBefore(LocalDateTime.now())){
-            throw new IllegalStateException("Token expired");
+            throw new TokenExpiredException("Token expired");
         }
 
         tokenService.setConfirmedAt(token);

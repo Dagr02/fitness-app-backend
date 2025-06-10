@@ -12,12 +12,15 @@ import java.util.Optional;
 @AllArgsConstructor
 public class TokenService {
     private final TokenRepo tokenRepo;
+
     public void saveConfirmationToken(Token token){
         tokenRepo.save(token);
     }
+
     public Optional<Token> getToken(String token){
         return tokenRepo.findByToken(token);
     }
+
     public int setConfirmedAt(String token){
         return tokenRepo.updateConfirmedAt(token, LocalDateTime.now());
     }
