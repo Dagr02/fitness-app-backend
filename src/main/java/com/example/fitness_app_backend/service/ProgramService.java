@@ -76,7 +76,7 @@ public class ProgramService {
 
         userProgramRepo.save(userProgram);
 
-        //return new object for context
+        //return new object
         List<ProgramExercise> programExercises = programExerciseRepo.findByProgramId(program.getId());
         List<UserExerciseLog> logs = userExerciseLogRepo.findByUserIdAndProgramId(user.getId(), program.getId());
         return programMapper.toUserProgramDTO(program, programExercises, logs);
