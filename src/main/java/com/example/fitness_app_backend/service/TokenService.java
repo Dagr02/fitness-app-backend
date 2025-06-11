@@ -5,6 +5,7 @@ import com.example.fitness_app_backend.repository.TokenRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -22,6 +23,6 @@ public class TokenService {
     }
 
     public int setConfirmedAt(String token){
-        return tokenRepo.updateConfirmedAt(token, LocalDateTime.now());
+        return tokenRepo.updateConfirmedAt(token, Instant.now());
     }
 }

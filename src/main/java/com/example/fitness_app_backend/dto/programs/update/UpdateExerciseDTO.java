@@ -1,9 +1,10 @@
-package com.example.fitness_app_backend.dto.programs;
+package com.example.fitness_app_backend.dto.programs.update;
 
 import lombok.Data;
 
 @Data
-public class CreateExerciseDTO {
+public class UpdateExerciseDTO {
+    private Long programExerciseId;
     private Long exerciseId;
     private Integer sets;
     private Integer reps;

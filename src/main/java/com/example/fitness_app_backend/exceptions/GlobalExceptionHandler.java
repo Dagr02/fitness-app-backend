@@ -1,9 +1,6 @@
 package com.example.fitness_app_backend.exceptions;
 
-import com.example.fitness_app_backend.exceptions.auth.TokenAlreadyConfirmedException;
-import com.example.fitness_app_backend.exceptions.auth.TokenExpiredException;
-import com.example.fitness_app_backend.exceptions.auth.TokenNotFoundException;
-import com.example.fitness_app_backend.exceptions.auth.UserAlreadyExistsException;
+import com.example.fitness_app_backend.exceptions.auth.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -42,7 +39,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<Map<String, String>> handleTokenExpired(TokenExpiredException ex) {
-        return ResponseEntity.status(HttpStatus.GONE)  // 410 Gone is appropriate for expired tokens
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(RefreshTokenExpiredException.class)
+    public ResponseEntity<Map<String, String>> handleRefreshTokenExpired(RefreshTokenExpiredException ex){
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(Map.of("error", ex.getMessage()));
     }
 

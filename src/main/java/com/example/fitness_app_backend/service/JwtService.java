@@ -1,6 +1,8 @@
 package com.example.fitness_app_backend.service;
 
+import com.example.fitness_app_backend.exceptions.auth.TokenExpiredException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -9,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -52,8 +55,8 @@ public class JwtService {
                 .builder()
                 .claims(claims)
                 .subject(userDetails.getUsername())
-                .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plusMillis(expiration)))
                 .signWith(getSignInKey(), Jwts.SIG.HS256)
                 .compact();
     }
@@ -72,12 +75,16 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token){
-        return Jwts
-                .parser()
-                .verifyWith(getSignInKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+        try {
+            return Jwts
+                    .parser()
+                    .verifyWith(getSignInKey())
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+        } catch (ExpiredJwtException e){
+            throw new TokenExpiredException("JWT token is expired");
+        }
     }
 
     private SecretKey getSignInKey() {

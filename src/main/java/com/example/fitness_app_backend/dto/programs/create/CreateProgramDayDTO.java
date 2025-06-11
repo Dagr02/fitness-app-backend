@@ -1,4 +1,4 @@
-package com.example.fitness_app_backend.dto.programs;
+package com.example.fitness_app_backend.dto.programs.create;
 
 
 import lombok.Data;

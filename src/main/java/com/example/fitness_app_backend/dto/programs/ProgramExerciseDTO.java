@@ -12,6 +12,7 @@ public class ProgramExerciseDTO {
     private String exerciseName;
     private int sets;
     private int reps;
+    private Double weight;
     private int orderIndex;
     private int dayNumber;
 

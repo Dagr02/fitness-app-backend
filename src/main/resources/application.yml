@@ -36,4 +36,5 @@ logging:
 
 security:
   jwt:
-    expiration-time: 3600000
+    expiration-time: 3600000 #1 hour
+    refresh-expiration-time: 2592000000 #30 days
