@@ -1,6 +1,7 @@
 package com.example.fitness_app_backend.service;
 
 import com.example.fitness_app_backend.dto.programs.*;
+import com.example.fitness_app_backend.dto.programs.create.CreateExerciseLogDTO;
 import com.example.fitness_app_backend.exceptions.ResourceNotFoundException;
 import com.example.fitness_app_backend.exceptions.auth.UserAlreadyExistsException;
 import com.example.fitness_app_backend.mapper.ProgramMapper;
@@ -21,9 +22,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -63,8 +64,8 @@ public class UserService implements UserDetailsService {
         String token = UUID.randomUUID().toString();
         Token confirmationToken = new Token(
                 token,
-                LocalDateTime.now(),
-                LocalDateTime.now().plusMinutes(10),
+                Instant.now(),
+                Instant.now().plus(Duration.ofMinutes(10)),
                 user
         );
 
@@ -80,7 +81,7 @@ public class UserService implements UserDetailsService {
         return (User) auth.getPrincipal();
     }
 
-    public Long getCurrentUserId(){
+    public UUID getCurrentUserId(){
         return getCurrentUser().getId();
     }
 

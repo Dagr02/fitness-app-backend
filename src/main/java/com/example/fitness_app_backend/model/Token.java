@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data
@@ -26,12 +27,12 @@ public class Token {
     private String token;
 
     @Column(nullable = false)
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Column(nullable = false)
-    private LocalDateTime expiresAt;
+    private Instant expiresAt;
 
-    private LocalDateTime confirmedAt;
+    private Instant confirmedAt;
 
     @ManyToOne
     @JoinColumn(
@@ -39,7 +40,7 @@ public class Token {
             name="user_id"
     )
     private User user;
-    public Token(String token, LocalDateTime createdAt, LocalDateTime expiresAt, User user) {
+    public Token(String token, Instant createdAt, Instant expiresAt, User user) {
         this.token = token;
         this.createdAt = createdAt;
         this.expiresAt = expiresAt;

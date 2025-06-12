@@ -1,6 +1,6 @@
 package com.example.fitness_app_backend.controller;
 
-import com.example.fitness_app_backend.dto.programs.CreateExerciseLogDTO;
+import com.example.fitness_app_backend.dto.programs.create.CreateExerciseLogDTO;
 import com.example.fitness_app_backend.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

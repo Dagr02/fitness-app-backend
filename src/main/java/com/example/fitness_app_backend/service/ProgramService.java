@@ -1,6 +1,13 @@
 package com.example.fitness_app_backend.service;
 
 import com.example.fitness_app_backend.dto.programs.*;
+import com.example.fitness_app_backend.dto.programs.create.CreateExerciseDTO;
+import com.example.fitness_app_backend.dto.programs.create.CreateProgramDTO;
+import com.example.fitness_app_backend.dto.programs.create.CreateProgramDayDTO;
+import com.example.fitness_app_backend.dto.programs.update.UpdateExerciseDTO;
+import com.example.fitness_app_backend.dto.programs.update.UpdateProgramDTO;
+import com.example.fitness_app_backend.dto.programs.update.UpdateProgramDayDTO;
+import com.example.fitness_app_backend.exceptions.ResourceNotFoundException;
 import com.example.fitness_app_backend.mapper.ProgramMapper;
 import com.example.fitness_app_backend.model.*;
 import com.example.fitness_app_backend.repository.*;
@@ -27,7 +34,7 @@ public class ProgramService {
     private final ProgramMapper programMapper;
 
     @Transactional
-    public UserProgramDTO createCustomProgram(@RequestBody CreateProgramDTO createProgramDTO){
+    public UserProgramDTO createCustomProgram(CreateProgramDTO createProgramDTO){
         //get current user
         User user = userService.getCurrentUser();
 
@@ -69,10 +76,57 @@ public class ProgramService {
 
         userProgramRepo.save(userProgram);
 
-        //return new object for context
+        //return new object
         List<ProgramExercise> programExercises = programExerciseRepo.findByProgramId(program.getId());
         List<UserExerciseLog> logs = userExerciseLogRepo.findByUserIdAndProgramId(user.getId(), program.getId());
         return programMapper.toUserProgramDTO(program, programExercises, logs);
+    }
+
+    @Transactional
+    public UserProgramDTO updateCustomProgram(UpdateProgramDTO dto){
+        User user = userService.getCurrentUser();
+
+        Program program = programRepo.findById(dto.getProgramId())
+                .orElseThrow( () -> new ResourceNotFoundException("Program not found"));
+
+        // verify program is owned by user
+        UserProgram userProgram = userProgramRepo.findByUserIdAndProgramId(user.getId(), dto.getProgramId())
+                .orElseThrow(() -> new AccessDeniedException("You don't have permission to delete this program"));
+
+        program.setName(dto.getName());
+        program.setDescription(dto.getDescription());
+        program.setStartDate(dto.getStartDate());
+        program.setEndDate(dto.getEndDate());
+        program.setUpdatedAt(LocalDateTime.now());
+
+        programRepo.save(program);
+
+        programExerciseRepo.deleteByProgramId(program.getId());
+
+        int orderIndex = 0;
+
+        for(UpdateProgramDayDTO dayDTO : dto.getWorkouts()){
+            for(UpdateExerciseDTO exDTO : dayDTO.getExercises()){
+                Exercise exercise = exerciseRepo.findById(exDTO.getExerciseId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Exercise not found"));
+
+                ProgramExercise pe = new ProgramExercise();
+                pe.setProgram(program);
+                pe.setExercise(exercise);
+                pe.setDayNumber(dayDTO.getDay());
+                pe.setOrderIndex(orderIndex++);
+                pe.setSets(exDTO.getSets());
+                pe.setReps(exDTO.getReps());
+
+                programExerciseRepo.save(pe);
+            }
+        }
+
+        List<ProgramExercise> programExercises = programExerciseRepo.findByProgramId(program.getId());
+        List<UserExerciseLog> logs = userExerciseLogRepo.findByUserIdAndProgramId(user.getId(), program.getId());
+
+        return programMapper.toUserProgramDTO(program, programExercises, logs);
+
     }
 
     @Transactional

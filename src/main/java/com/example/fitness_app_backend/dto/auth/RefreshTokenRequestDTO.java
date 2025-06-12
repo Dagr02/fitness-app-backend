@@ -5,9 +5,6 @@ import lombok.Data;
 import java.util.UUID;
 
 @Data
-public class LoginResponseDTO {
-    private String token;
-    private long expiresIn;
-
+public class RefreshTokenRequestDTO {
     private UUID refreshToken;
 }

@@ -17,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Service
 @AllArgsConstructor
@@ -67,9 +67,9 @@ public class AuthenticationService {
             );
         }
 
-        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+        Instant expiredAt = confirmationToken.getExpiresAt();
 
-        if(expiredAt.isBefore(LocalDateTime.now())){
+        if(expiredAt.isBefore(Instant.now())){
             throw new TokenExpiredException("Token expired");
         }
 
