@@ -5,6 +5,9 @@ spring:
     active: local
   datasource:
     driver-class-name: org.postgresql.Driver
+    url: { DB_URL }
+    username: { DB_USERNAME }
+    password: { DB_PASSWORD }
   jpa:
     properties:
       hibernate.dialect: org.hibernate.dialect.PostgreSQLDialect
@@ -17,6 +20,8 @@ spring:
     locations: classpath:db/migration
 
   mail:
+    username: { EMAIL_ADDRESS }
+    password: { EMAIL_APP_PASSWORD }
     host: smtp.gmail.com
     port: 587
     properties:
@@ -36,5 +41,6 @@ logging:
 
 security:
   jwt:
+    secret-key: {JWT_SECRET_KEY}
     expiration-time: 3600000 #1 hour
     refresh-expiration-time: 2592000000 #30 days
